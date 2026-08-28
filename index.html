@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI（ChatGPT / Gemini / Claude）を最高のTRPGゲームマスターに変貌させるプロンプト生成ツール。二段階生成、収束条件進行、音声会話モード等に対応。">
+    <meta name="keywords" content="TRPG, AI, ChatGPT, Gemini, Claude, Prompt Generator, ゲームマスター, プロンプトジェネレーター, AIアドベンチャー">
+    <meta name="author" content="TRPG AI Project">
+    <meta name="version" content="1.0.0">
+    
+    <!-- Open Graph / OGP -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="TRPG GM プロンプトジェネレーター v1.0.0">
+    <meta property="og:description" content="AIを最高のゲームマスターにするプロンプト生成ツール。シナリオ・主要人物・進行判定ロジックを一元構築。">
+    <meta property="og:site_name" content="TRPG GM Prompt Generator">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TRPG GM プロンプトジェネレーター v1.0.0">
+    <meta name="twitter:description" content="AIを最高のゲームマスターにするプロンプト生成ツール。">
+
+    <title>TRPG GM プロンプトジェネレーター v1.0.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        
+        body { 
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+        .gradient-bg { 
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); 
+        }
+        .card-bg {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        .input-style {
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            color: #f1f5f9;
+            transition: all 0.2s;
+        }
+        .input-style:focus {
+            border-color: #818cf8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
+        }
+        .prompt-card { 
+            background-color: #0f172a; 
+            border: 1px solid #334155; 
+            border-radius: 0.75rem; 
+            padding: 1rem; 
+            margin-bottom: 1rem; 
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16">
+
+    <!-- Header -->
+    <header class="gradient-bg border-b border-indigo-500/30 text-white py-8 shadow-2xl mb-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent pointer-events-none"></div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 border border-indigo-400/30 rounded-full text-indigo-300 text-xs font-semibold mb-3 tracking-wider uppercase">
+                <span>AI TRPG / Text & Voice RPG Generator</span>
+                <span class="bg-indigo-600 text-white px-2 py-0.5 rounded-full text-[10px] font-mono">v1.0.0</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-white to-purple-200">
+                TRPG GM PROMPT GENERATOR
+            </h1>
+            <p class="text-indigo-200 text-sm md:text-base max-w-xl mx-auto opacity-90">
+                AIを最高のゲームマスターに変貌させるプロンプト作成ツール。
+            </p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 max-w-4xl">
+        <div class="card-bg rounded-2xl shadow-2xl overflow-hidden mb-8">
+            <div class="p-6 md:p-8 space-y-8">
+                
+                <!-- Scenario Selection -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
+                            <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">1</span>
+                            世界観・シナリオを選択
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <button type="button" onclick="selectScenario('fantasy')" id="btn-fantasy" class="scenario-btn border-2 border-indigo-500/30 p-4 rounded-xl hover:border-indigo-400 bg-slate-900/50 transition-all text-left group">
+                            <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">⚔️</div>
+                            <div class="font-bold text-slate-200 text-sm">王道ファンタジー</div>
+                            <div class="text-[11px] text-slate-400 mt-1">魔王討伐の旅</div>
+                        </button>
+                        <button type="button" onclick="selectScenario('japanese')" id="btn-japanese" class="scenario-btn border-2 border-indigo-500/30 p-4 rounded-xl hover:border-indigo-400 bg-slate-900/50 transition-all text-left group">
+                            <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">⛩️</div>
+                            <div class="font-bold text-slate-200 text-sm">和風あやかし伝</div>
+                            <div class="text-[11px] text-slate-400 mt-1">妖怪王退治の旅</div>
+                        </button>
+                        <button type="button" onclick="selectScenario('sf')" id="btn-sf" class="scenario-btn border-2 border-indigo-500/30 p-4 rounded-xl hover:border-indigo-400 bg-slate-900/50 transition-all text-left group">
+                            <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">🚀</div>
+                            <div class="font-bold text-slate-200 text-sm">SFスペースオペラ</div>
+                            <div class="text-[11px] text-slate-400 mt-1">星間帝国への旅</div>
+                        </button>
+                        <button type="button" onclick="selectScenario('custom')" id="btn-custom" class="scenario-btn border-2 border-indigo-500/30 p-4 rounded-xl hover:border-indigo-400 bg-slate-900/50 transition-all text-left group">
+                            <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">✨</div>
+                            <div class="font-bold text-slate-200 text-sm">完全カスタム</div>
+                            <div class="text-[11px] text-slate-400 mt-1">全自由設定</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hero & Basic Settings -->
+                <div class="space-y-4 pt-2 border-t border-slate-700/60">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
+                            <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">2</span>
+                            主人公・難易度設定
+                        </label>
+                        <button type="button" onclick="randomizeHero()" class="text-xs bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
+                            🎲 主人公をランダム入力
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">主人公の名前</label>
+                            <input type="text" id="heroName" placeholder="例：アルス" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">職業・肩書</label>
+                            <input type="text" id="heroJob" placeholder="例：見習い剣士" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">ゲーム難易度</label>
+                            <select id="difficulty" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                                <option value="標準（バランス重視、程よい緊張感）">標準（推奨）</option>
+                                <option value="ハードコア（厳密なリソース管理、全滅の危険あり）">ハードコア</option>
+                                <option value="カジュアル（物語重視、死亡回避しやすい）">カジュアル</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- World & Country Settings -->
+                <div class="space-y-4 pt-2 border-t border-slate-700/60">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
+                            <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">3</span>
+                            旅のルート・3つの国（ステージ）設定
+                        </label>
+                        <button type="button" onclick="randomizeCountries()" class="text-xs bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
+                            🎲 地名をランダム生成
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-indigo-400 mb-1">第1の国 (序盤)</label>
+                            <input type="text" id="country1" placeholder="例：ルミナリア王国" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-indigo-400 mb-1">第2の国 (中盤)</label>
+                            <input type="text" id="country2" placeholder="例：ヴェルダン森林同盟" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-indigo-400 mb-1">第3の国 (終盤)</label>
+                            <input type="text" id="country3" placeholder="例：ドグラザード帝国" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">始まりの街</label>
+                            <input type="text" id="startTown" placeholder="例：はじまりの村ルークス" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">最終目的地 (魔王城・最深部など)</label>
+                            <input type="text" id="finalGoal" placeholder="例：魔王城（暗黒城ヴェルゼ）" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Extension Section -->
+                <div id="customExtForm" class="space-y-4 pt-2 border-t border-slate-700/60 transition-all opacity-50 pointer-events-none">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-bold text-amber-300 flex items-center gap-2">
+                            <span class="bg-amber-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">⚙️</span>
+                            完全カスタム用：世界観・目的・イベント＆ターン設定
+                        </label>
+                        <span id="customLockBadge" class="text-[10px] bg-slate-800 text-slate-400 border border-slate-700 px-2 py-0.5 rounded font-normal">「完全カスタム」選択時のみ編集可能</span>
+                    </div>
+
+                    <!-- Turn Settings -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-amber-200/80 mb-1">始まりの街の目安ターン数（セーフティネット基準）</label>
+                            <select id="startTownTurns" disabled class="w-full px-3 py-2 text-sm rounded-lg input-style border-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <option value="1">1ターン</option>
+                                <option value="2">2ターン</option>
+                                <option value="3">3ターン</option>
+                                <option value="4" selected>4ターン（標準）</option>
+                                <option value="5">5ターン</option>
+                                <option value="6">6ターン</option>
+                                <option value="7">7ターン</option>
+                                <option value="8">8ターン</option>
+                                <option value="9">9ターン</option>
+                                <option value="10">10ターン</option>
+                                <option value="12">12ターン</option>
+                                <option value="15">15ターン</option>
+                                <option value="20">20ターン（超じっくり）</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-amber-200/80 mb-1">各国の目安ターン数（セーフティネット基準）</label>
+                            <select id="countryTurns" disabled class="w-full px-3 py-2 text-sm rounded-lg input-style border-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <option value="1">1ターン</option>
+                                <option value="2">2ターン</option>
+                                <option value="3">3ターン</option>
+                                <option value="4">4ターン</option>
+                                <option value="5">5ターン</option>
+                                <option value="6" selected>6ターン（標準）</option>
+                                <option value="7">7ターン</option>
+                                <option value="8">8ターン</option>
+                                <option value="9">9ターン</option>
+                                <option value="10">10ターン</option>
+                                <option value="12">12ターン</option>
+                                <option value="15">15ターン</option>
+                                <option value="20">20ターン（超じっくり）</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Individual Custom Input Fields -->
+                    <div class="space-y-3 pt-2">
+                        <div>
+                            <label class="block text-xs text-amber-200/80 mb-1">① 世界観・舞台設定</label>
+                            <textarea id="customWorld" disabled rows="2" placeholder="例：魔法技術と蒸気機関が発達したスチームパンク世界。空に浮遊する大陸群と旧文明の巨大遺跡が存在する。" class="w-full px-3 py-2 text-sm rounded-lg input-style border-amber-500/40 leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-amber-200/80 mb-1">② 主人公の旅の目的・最終達成条件</label>
+                            <input type="text" id="customGoalText" disabled placeholder="例：星のエネルギーを吸い尽くす古代兵器「ラグナロク」を停止させ、世界を滅亡から救う。" class="w-full px-3 py-2 text-sm rounded-lg input-style border-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-amber-200/80 mb-1">③ 道中で発生する主要なイベント・試練・仕掛け</label>
+                            <textarea id="customEvents" disabled rows="2" placeholder="例：第1の国でライバルの盗賊団と衝突、第2の国で古代遺跡の解読パズル、第3の国で仲間の過去を巡る試練が発生する。" class="w-full px-3 py-2 text-sm rounded-lg input-style border-amber-500/40 leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key NPCs -->
+                <div class="space-y-4 pt-2 border-t border-slate-700/60">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
+                            <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">4</span>
+                            旅で出会う主要人物（3名）
+                        </label>
+                        <button type="button" onclick="randomizeNPCs()" class="text-xs bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
+                            🎲 人物をランダム生成
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">人物1 (名前と簡単な役割)</label>
+                            <input type="text" id="npc1" placeholder="例：エレナ（元聖騎士の剣士）" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">人物2 (名前と簡単な役割)</label>
+                            <input type="text" id="npc2" placeholder="例：シオン（風の精霊術士）" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">人物3 (名前と簡単な役割)</label>
+                            <input type="text" id="npc3" placeholder="例：ガルド（さすらいの鍛冶師）" class="w-full px-3 py-2 text-sm rounded-lg input-style">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Style -->
+                <div class="space-y-4 pt-2 border-t border-slate-700/60">
+                    <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
+                        <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">5</span>
+                        ビジュアル画風（画像生成AI用）
+                    </label>
+                    <select id="artStyle" class="w-full px-4 py-2.5 text-sm rounded-lg input-style">
+                        <option value="ハイファンタジー風コンセプトアート、重厚な油彩と光の表現、美麗">ダーク・ハイファンタジー絵画風（標準）</option>
+                        <option value="90年代レトロ16bitドット絵グラフィック風、ドット画">レトロRPGドット絵風</option>
+                        <option value="高品質な日本のアニメーション風、劇場版アニメクオリティ、鮮やか">アニメーション風</option>
+                        <option value="リアルな実写映画調、シネマティックライティング、4K緻密">シネマティックリアル風</option>
+                        <option value="幻想的な水彩画風、淡いグラデーションと繊細な線画">水彩イラスト風</option>
+                        <option value="ペン画と鉛筆スケッチ調、モノクロ＋差し色、シック">羊皮紙スケッチ風</option>
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700/60">
+                    <button type="button" onclick="randomizeAll()" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                        <span>🎲</span> すべてランダム入力
+                    </button>
+                    <button type="button" onclick="generatePrompts()" class="md:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform active:scale-[0.99] text-center">
+                        PROMPT GENERATE (プロンプト生成)
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Output Area -->
+            <div id="outputSection" class="hidden border-t border-slate-700/80 bg-slate-950 p-6 md:p-8 space-y-6">
+                
+                <!-- 1. Visual Prompt -->
+                <div class="prompt-card border-indigo-500/30">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-indigo-400 flex items-center gap-2 text-sm md:text-base">
+                            <span>🖼️</span> 【手順1】冒険の始まり イメージ画像生成プロンプト
+                        </h3>
+                        <span class="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-700/50 px-2 py-0.5 rounded-full">DALL-E 3 / Gemini / MJ</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3">最初にこれを画像生成AI（DALL-E 3やGeminiなど）へ貼り付けて、冒険の始まりのイラストを出力させてください。</p>
+                    <pre id="visualPromptResult" class="bg-slate-900 border border-slate-800 p-3.5 rounded-lg text-xs text-indigo-200 max-h-52 overflow-y-auto whitespace-pre-wrap font-mono leading-relaxed mb-3"></pre>
+                    <button type="button" onclick="copyText('visualPromptResult')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2">
+                        📋 画像用プロンプトをコピー
+                    </button>
+                </div>
+
+                <!-- 2. GM Prompt -->
+                <div class="prompt-card border-emerald-500/30">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-emerald-400 flex items-center gap-2 text-sm md:text-base">
+                            <span>📜</span> 【手順2】ゲームマスター(GM) 進行用システムプロンプト
+                        </h3>
+                        <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded-full">ChatGPT / Gemini / Claude用</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3">画像が生成された後（または直接）、このプロンプトをチャットAIへ貼り付けてゲームを開始してください。</p>
+                    <pre id="gmPromptResult" class="bg-slate-900 border border-slate-800 p-3.5 rounded-lg text-xs text-emerald-200 max-h-80 overflow-y-auto whitespace-pre-wrap font-mono leading-relaxed mb-3"></pre>
+                    <button type="button" onclick="copyText('gmPromptResult')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2">
+                        📋 GM用プロンプトをコピー
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- How to Play Card -->
+        <div class="card-bg p-6 rounded-2xl border border-slate-700/60 shadow-xl">
+            <h3 class="font-bold text-slate-200 mb-4 flex items-center gap-2 text-sm md:text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                AI TRPGの遊び方（ChatGPT / Gemini / Claude 共通）
+            </h3>
+            <ol class="text-xs md:text-sm text-slate-300 space-y-3">
+                <li class="flex gap-3 items-start">
+                    <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
+                    <div>設定を入力して「PROMPT GENERATE」を押します。（迷ったら「🎲すべてランダム」が便利です）</div>
+                </li>
+                <li class="flex gap-3 items-start">
+                    <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+                    <div><strong>【手順1】</strong>のプロンプトをAIに送信して、冒険の旅立ちイメージ画像を生成させます。</div>
+                </li>
+                <li class="flex gap-3 items-start">
+                    <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
+                    <div>画像が出力されたら、続けて<strong>【手順2】</strong>のプロンプトを送信するとAIがGMとして物語を開始します。</div>
+                </li>
+                <li class="flex gap-3 items-start">
+                    <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">4</span>
+                    <div>毎ターンAIから状況描写と [A][B][C][自由入力] の選択肢が提示されます。自由に入力してあなただけの物語を紡ぎましょう！</div>
+                </li>
+                <li class="flex gap-3 items-start border-t border-slate-700/60 pt-3 text-amber-200/90">
+                    <span class="bg-amber-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">💡</span>
+                    <div>
+                        <strong>特殊入力＆音声会話テクニック：</strong><br>
+                        ・GMの解釈や判定に異議・疑問がある場合は回答を<strong>「＊質問や異議内容＊」</strong>のようにアスタリスクで囲むとGMが補足や調整を行います。<br>
+                        ・音声会話（リアルタイム会話モード）の場合は、GMが進行状況や選択肢を冗長にならずテンポ良く開示するように指示されています。
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-6 py-3 rounded-full shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none text-xs font-bold z-50 flex items-center gap-2 border border-indigo-400">
+        <span>✅</span> <span id="toastMsg">クリップボードにコピーしました！</span>
+    </div>
+
+    <script>
+        let currentScenario = 'fantasy';
+
+        const scenarioPresets = {
+            fantasy: {
+                heroName: 'アルス',
+                heroJob: '駆け出しの剣士',
+                startTown: '始まりの街ルークス',
+                country1: '聖騎士の国ルミナリア',
+                country2: '精霊の森ヴェルダン',
+                country3: '機巧都市ドグラザード',
+                finalGoal: '魔王城（暗黒城ヴェルゼ）',
+                npc1: 'エレナ（元聖騎士の女剣士）',
+                npc2: 'シオン（風の精霊術士）',
+                npc3: 'ガルド（ドワーフの頑固な鍛冶師）',
+                desc: '冒険者が魔王城へ向かう王道ファンタジー物語。'
+            },
+            japanese: {
+                heroName: 'ヤマト',
+                heroJob: '浪人の怪異退治屋',
+                startTown: '宿場町・日照り村',
+                country1: '神木の国・葦原ノ国',
+                country2: '水妖の国・八重波領',
+                country3: '鬼ヶ島・黒金城下',
+                finalGoal: '妖王の根城・天魔殿',
+                npc1: '楓（狐のお祓い巫女）',
+                npc2: '雷蔵（はぐれ忍び）',
+                npc3: '小太郎（妖薬を扱う薬売り）',
+                desc: '人知れず迫る妖怪王討伐を目指す和風あやかし冒険奇譚。'
+            },
+            sf: {
+                heroName: 'カイ',
+                heroJob: '宇宙船パイロット',
+                startTown: 'フロンティア宇宙港',
+                country1: '貿易星系オリオン',
+                country2: 'サイバー都市星ゼノン',
+                country3: '古代遺跡惑星アルカディア',
+                finalGoal: '銀河帝国要塞ドゥーム',
+                npc1: 'リア（天才アンドロイドエンジニア）',
+                npc2: 'ザック（元帝国軍の賞金稼ぎ）',
+                npc3: 'VEX（自律型情報AIドローン）',
+                desc: '銀河の平和を取り戻すため帝国要塞を目指すSFスペースオペラ。'
+            },
+            custom: {
+                heroName: '',
+                heroJob: '',
+                startTown: '',
+                country1: '',
+                country2: '',
+                country3: '',
+                finalGoal: '',
+                npc1: '',
+                npc2: '',
+                npc3: '',
+                desc: '完全ユーザー入力のオリジナル世界観とシナリオ。'
+            }
+        };
+
+        const randomData = {
+            names: ['アルス', 'ライナー', 'ルカ', 'フェイ', 'ヴァル', 'カイン', 'セリス', 'ノア', 'レオン', 'アスカ'],
+            jobs: ['魔導士', '放浪の魔法剣士', '影の暗殺者', '聖騎士', '精霊使い', '機械技師', '吟遊詩人', '龍脈の巫女', '竜騎士', 'トレジャーハンター'],
+            startTowns: ['風の渡る街エアリー', '始まりの港町レヴィア', '夕暮れの村オアシス', '緑の平原の宿場町', '雲上の交易都市'],
+            countries1: ['神聖ルミナリア帝国', '商業連邦ゼファー', '武導の国バルバロス', '氷雪の王国グラシエ', '太陽の都サリア'],
+            countries2: ['精霊大森林ヴェルダン', '地下都市モルダン', '竜の峰ドラゴニア', '天空諸島アリア', '深海都市アクアリス'],
+            countries3: ['機械帝国ドグラザード', '死霊の奈落ヘルヘイム', '暗黒魔導国ゼノビア', '黄昏の廃墟都市', '異界の門ウルティマ'],
+            finalGoals: ['魔王城ヴェルゼ', '魔導巨兵の核', '深淵の心臓', '破壊神の神殿', '世界樹の最深部'],
+            npcs: [
+                ['エレナ（頼れる元騎士長）', 'シオン（冷静沈着な魔術師）', 'ガルド（頑固だが義理堅い鍛冶師）'],
+                ['ルナ（秘密を抱えた盗賊少女）', 'バルド（酒好きな傭兵）', 'アリア（記憶喪失の聖女）'],
+                ['クロード（不敵な情報屋）', 'ミラ（魔導技師）', 'カイザー（さすらいの剣豪）']
+            ]
+        };
+
+        function selectScenario(id) {
+            currentScenario = id;
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'bg-indigo-950/60', 'ring-2', 'ring-indigo-500/50');
+                btn.classList.add('border-indigo-500/30', 'bg-slate-900/50');
+            });
+            
+            const selected = document.getElementById('btn-' + id);
+            selected.classList.remove('border-indigo-500/30', 'bg-slate-900/50');
+            selected.classList.add('border-indigo-500', 'bg-indigo-950/60', 'ring-2', 'ring-indigo-500/50');
+
+            // Custom scenario unlock/lock logic
+            const isCustom = (id === 'custom');
+            const customExtForm = document.getElementById('customExtForm');
+            const startTownTurns = document.getElementById('startTownTurns');
+            const countryTurns = document.getElementById('countryTurns');
+            const customWorld = document.getElementById('customWorld');
+            const customGoalText = document.getElementById('customGoalText');
+            const customEvents = document.getElementById('customEvents');
+            const customLockBadge = document.getElementById('customLockBadge');
+
+            if (isCustom) {
+                customExtForm.classList.remove('opacity-50', 'pointer-events-none');
+                startTownTurns.disabled = false;
+                countryTurns.disabled = false;
+                customWorld.disabled = false;
+                customGoalText.disabled = false;
+                customEvents.disabled = false;
+                customLockBadge.innerText = '編集可能';
+                customLockBadge.className = 'text-[10px] bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded font-normal';
+            } else {
+                customExtForm.classList.add('opacity-50', 'pointer-events-none');
+                startTownTurns.disabled = true;
+                countryTurns.disabled = true;
+                customWorld.disabled = true;
+                customGoalText.disabled = true;
+                customEvents.disabled = true;
+                customLockBadge.innerText = '「完全カスタム」選択時のみ編集可能';
+                customLockBadge.className = 'text-[10px] bg-slate-800 text-slate-400 border border-slate-700 px-2 py-0.5 rounded font-normal';
+            }
+
+            const preset = scenarioPresets[id];
+            if (id !== 'custom') {
+                document.getElementById('heroName').value = preset.heroName;
+                document.getElementById('heroJob').value = preset.heroJob;
+                document.getElementById('startTown').value = preset.startTown;
+                document.getElementById('country1').value = preset.country1;
+                document.getElementById('country2').value = preset.country2;
+                document.getElementById('country3').value = preset.country3;
+                document.getElementById('finalGoal').value = preset.finalGoal;
+                document.getElementById('npc1').value = preset.npc1;
+                document.getElementById('npc2').value = preset.npc2;
+                document.getElementById('npc3').value = preset.npc3;
+                
+                // Reset custom specific inputs
+                startTownTurns.value = '4';
+                countryTurns.value = '6';
+                customWorld.value = '';
+                customGoalText.value = '';
+                customEvents.value = '';
+            }
+        }
+
+        function randomizeHero() {
+            document.getElementById('heroName').value = getRandom(randomData.names);
+            document.getElementById('heroJob').value = getRandom(randomData.jobs);
+        }
+
+        function randomizeCountries() {
+            document.getElementById('startTown').value = getRandom(randomData.startTowns);
+            document.getElementById('country1').value = getRandom(randomData.countries1);
+            document.getElementById('country2').value = getRandom(randomData.countries2);
+            document.getElementById('country3').value = getRandom(randomData.countries3);
+            document.getElementById('finalGoal').value = getRandom(randomData.finalGoals);
+        }
+
+        function randomizeNPCs() {
+            const set = getRandom(randomData.npcs);
+            document.getElementById('npc1').value = set[0];
+            document.getElementById('npc2').value = set[1];
+            document.getElementById('npc3').value = set[2];
+        }
+
+        function randomizeAll() {
+            selectScenario('custom');
+            randomizeHero();
+            randomizeCountries();
+            randomizeNPCs();
+        }
+
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generatePrompts() {
+            const heroName = document.getElementById('heroName').value || '主人公';
+            const heroJob = document.getElementById('heroJob').value || '冒険者';
+            const difficulty = document.getElementById('difficulty').value;
+            const startTown = document.getElementById('startTown').value || '始まりの街';
+            const country1 = document.getElementById('country1').value || '第1の国';
+            const country2 = document.getElementById('country2').value || '第2の国';
+            const country3 = document.getElementById('country3').value || '第3の国';
+            const finalGoal = document.getElementById('finalGoal').value || '最終目的地';
+            const npc1 = document.getElementById('npc1').value || '旅の人物1';
+            const npc2 = document.getElementById('npc2').value || '旅の人物2';
+            const npc3 = document.getElementById('npc3').value || '旅の人物3';
+            const artStyle = document.getElementById('artStyle').value;
+
+            // Turn settings
+            const startTownTurns = document.getElementById('startTownTurns').value || '4';
+            const countryTurns = document.getElementById('countryTurns').value || '6';
+
+            // Custom scenario inputs
+            const isCustomMode = (currentScenario === 'custom');
+            const customWorldVal = document.getElementById('customWorld').value.trim();
+            const customGoalVal = document.getElementById('customGoalText').value.trim();
+            const customEventsVal = document.getElementById('customEvents').value.trim();
+
+            let customPromptSection = '';
+            if (isCustomMode && (customWorldVal || customGoalVal || customEventsVal)) {
+                customPromptSection = `\n【完全カスタム追加詳細】`;
+                if (customWorldVal) customPromptSection += `\n- 世界観・舞台背景：${customWorldVal}`;
+                if (customGoalVal) customPromptSection += `\n- 達成目的・目標：${customGoalVal}`;
+                if (customEventsVal) customPromptSection += `\n- 主要イベント・試練：${customEventsVal}`;
+                customPromptSection += `\n`;
+            }
+
+            // 1. Visual Prompt Logic
+            let visualContext = `冒険の始まりの物語シーン。主人公「${heroName}」（職業：${heroJob}）が、冒険の拠点「${startTown}」から遙かなる目的地「${finalGoal}」を目指して旅立とうとしている場面。`;
+            if (isCustomMode && customWorldVal) {
+                visualContext += `\n世界観：${customWorldVal}`;
+            }
+
+            const visualPrompt = `画像生成を実行してください。
+
+【テーマ】
+${visualContext}
+
+【アートスタイル】
+${artStyle}
+
+【重要指示】
+- 画像内に文字列、ロゴ、UI、テキスト、セリフ、数字などを一切含めないでください。
+- 物語の導入として、世界観と主人公の旅立ちを感じさせる、没入感の高い壮大な一枚絵（ビジュアル）を作成してください。`;
+
+            // 2. GM Prompt Logic
+            const gmPrompt = `これは冒険者が${finalGoal}へ向かう物語である。
+
+あなたは自由度の高いテキスト型RPGのゲームマスターです。
+以下の設定と、それまでの冒険で確定した出来事を保持しながら物語を進行してください。
+
+## 基本設定
+- 主人公：${heroName}
+- 職業：${heroJob}
+- 難易度：${difficulty}
+- 始まりの街：${startTown}
+- 第1の国：${country1}
+- 第2の国：${country2}
+- 第3の国：${country3}
+- 最終目的地：${finalGoal}
+- 旅で出会う主要人物：${npc1}、${npc2}、${npc3}${customPromptSection}
+
+## 冒険ルート
+基本ルートは、
+${startTown} → ${country1} → ${country2} → ${country3} → ${finalGoal}
+です。
+
+## ステージ進行の判断基準（収束条件による動的進行）
+各ステージ（拠点・国）には固定のターン上限を設けません。毎ターンの応答を生成する前に、以下の「収束条件」を常に意識し照合してください。
+
+【収束条件】
+1. このステージに割り当てられた指定イベント（主要人物との出会い、または設定されたイベント）が何らかの形で発生し、決着または一時的な区切りを迎えている
+2. このステージで登場する人物との関係性に進展（同行・対立・離脱・信頼構築など）があった
+3. プレイヤーが次の目的地へ向かうための動機・情報・きっかけを得ている
+
+★ 上記3条件のうち2つ以上を満たした時点で、それ以降のターンから自然な文脈の中で次の目的地への出立を促す展開（新たな手がかり、きっかけとなる事件など）を差し込み始めてください。
+
+【指定イベントの扱い（未消化の防止）】
+指定イベントは一回きりの提示で終わらせず、プレイヤーの行動で回避・不発となった場合は「未回収の種」として保持し続けてください。
+探索や戦闘など別の行動を行っている場合でも、その行動と自然に絡めた形（探索先で遭遇、戦闘中に関係者が現れる等）に姿を変え、そのステージが終わるまでに必ず一度は発生させてください。
+
+【セーフティネット（保険としての緩い上限）】
+収束条件が長期間（目安：始まりの街 ${startTownTurns}ターン、各ステージ ${countryTurns}ターン程度）満たされないまま進行した場合は、状況を強制的に動かして構いません。これまでの行動や蓄積された情報を理由とした、自然な形での移行イベントを発生させてください。
+
+## 二段階生成方式（内部判定 → 応答生成）
+毎ターン、プレイヤーへの応答を生成する前に内部判定を行ってください。この判定結果はプレイヤーには一切出力せず、思考用としてのみ使用してください。
+
+ステップ1：内部判定（思考・非表示）
+- 収束条件1〜3について、それぞれ満たしているか（Yes/No）
+- 指定イベントは「消化済み」か「未回収」か
+- 未回収の場合、今回のターンでプレイヤーの行動に自然に絡められる機会があるか（Yes/No）
+- セーフティネットの目安ターン数（${startTownTurns}/${countryTurns}ターン）に対し、現在どの程度進行しているか（余裕／注意／超過）
+
+ステップ2：応答生成（プレイヤーへの出力）
+- ステップ1の判定結果を踏まえ、物語応答（状況描写＋行動候補の提示）を生成する
+- 未回収の指定イベントを絡める機会がある場合は、このターンの描写に組み込む
+- 収束条件が2つ以上満たされている場合は、次の目的地への移行を促す描写を含める
+- セーフティネットが「超過」の場合は、状況を強制的に動かす展開を含める
+
+## 世界とシナリオ
+世界設定、${startTown}、各国の文化や社会、街や村、事件、NPC、敵、最終目標（ボス等）、旅の途中で起きる出来事は、冒険の進行に合わせて自由に創作してください。
+${customEventsVal ? '\n【指定イベント・試練】\n' + customEventsVal + '\n上記で指定されたイベントや試練を、旅の進行（各ステージ）に合わせて適切に組み込んでください。\n' : ''}
+3つの国では、それぞれ異なる出来事や問題を発生させ、同じ展開の繰り返しにならないようにしてください。
+
+最終ボスや各国の善悪、物語の真相、最終的な結末は事前に固定しないでください。
+
+## 主要人物
+設定された3人（${npc1}、${npc2}、${npc3}）は、${finalGoal}へ到着するまでのどこかで、それぞれ自然な登場イベントを作ってください。
+
+3人の職業、性格、立場、過去、主人公との関係は自由に設定してください。
+
+登場した人物が必ず仲間になる必要はありません。
+プレイヤーの行動によって、同行、離脱、対立、裏切り、再会など関係を変化させてください。
+
+## プレイヤーの行動と対話ルール
+状況を描写したあと、毎ターン必ず次の形式で行動候補を提示してください。
+
+[A] 行動案
+[B] 行動案
+[C] 行動案
+[自由入力] 好きな行動を入力
+
+A・B・Cはあくまで行動例です。
+プレイヤーが自由入力した行動も正式な選択として扱い、可能な限り物語へ反映してください。
+
+### 【疑義・判定への疑問ルール】
+プレイヤーの回答が ＊（アスタリスク） で囲まれている場合（例：＊今の描写はおかしくない？＊ や ＊鍵が開かないのはなぜ？＊）、それは状況判定やゲームマスターの進行内容に対する疑義・質問を表しています。
+GMは物語を安易に進行させず、ルールや状況の補足説明・回答を行い、必要に応じて柔軟に描写の調整や修正を行ってください。
+
+### 【音声会話モード（Voice Chat）対応】
+プレイヤーとのやり取りが「音声会話（リアルタイム音声モード等）」で行われている場合、以下の対応を最優先してください：
+- 長文の朗読を避け、進行状況や場の状況を要約してテンポよく伝えること。
+- 次の行動の選択肢（A/B/C）や質問に対する返答を臨機応変かつ簡潔に提示すること。
+- 開示する情報の優先度を見極め、会話が自然かつ軽快に弾むよう臨機応変にレスポンスすること。
+
+## 記憶と整合性
+以下は冒険中、一貫して保持してください。
+
+- 主人公の名前（${heroName}）と職業（${heroJob}）
+- 3つの国の名前（${country1}、${country2}、${country3}）
+- 主要人物3人の名前
+- 現在地
+- 現在のステージと進行状況（収束条件の判定状況）
+- 仲間や主要人物との関係
+- これまでの重要な出来事
+- 入手した情報
+- 所持アイテム
+- 消費・紛失・譲渡したアイテム
+- 未解決の事件や約束
+
+一度確定した設定や出来事を、理由なく変更しないでください。
+
+## 毎ターンの表示
+毎ターンの最後に、現在の状態を簡潔に表示してください（※二段階生成のステップ1内部判定結果は表示せず、以下のみ表示すること）。
+
+【現在地】
+【進行】現在のステージ
+【主人公】${heroName} / ${heroJob}
+【同行者】
+【所持アイテム】
+【重要な情報・出来事】
+
+その後に、
+
+[A]
+[B]
+[C]
+[自由入力]
+
+を表示してください。
+
+所持アイテムや情報は、追加・使用・消失などがあれば必ず更新してください。
+
+## 目的地（${finalGoal}）到着
+${finalGoal}へ到着した時点で、ステージ進行の制約を解除してください。
+
+${finalGoal}に到着したことを描写したあと、
+
+「冒険者は解き放たれた。次は何を望む？」
+
+と問いかけてください。
+
+以降は最終目標の達成を強制せず、プレイヤーの行動に従って自由に物語を続けてください。
+
+---
+【状況】
+プレイヤーは今、あなたが生成した（あるいは描写された）${startTown}からの旅立ちの光景を目の当たりにしています。
+この世界観を前提として、物語の最初の描写（オープニング）を開始してください。`;
+
+            document.getElementById('visualPromptResult').innerText = visualPrompt;
+            document.getElementById('gmPromptResult').innerText = gmPrompt;
+            document.getElementById('outputSection').classList.remove('hidden');
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('クリップボードにコピーしました！');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            showToast('クリップボードにコピーしました！');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        // Initialize default scenario
+        window.onload = function() {
+            selectScenario('fantasy');
+        };
+    </script>
+</body>
+</html>
