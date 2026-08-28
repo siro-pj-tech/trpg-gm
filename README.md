@@ -5,7 +5,7 @@
 
 LLM（ChatGPT, Gemini, Claude 等）を高度で没入感のある **TRPGゲームマスター（GM）** へ変貌させるシステムプロンプトおよび画像生成AI用プロンプトの自動作成Webツールです。
 
-👉 **[TRPG_GMプロンプトジェネレーターを試す（GitHub Pages）](https://<YOUR-USERNAME>.github.io/<YOUR-REPOSITORY-NAME>/)**
+👉 **[TRPG_GMプロンプトジェネレーターを試す（GitHub Pages）](https://siro-pj-tech.github.io/trpg-gm/)**
 
 ---
 
