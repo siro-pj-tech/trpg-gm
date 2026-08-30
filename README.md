@@ -1,11 +1,11 @@
-# 🎲 TRPG GM Prompt Generator (v1.0.0)
+# 🎲 TRPG GM Prompt Generator IZAYOI KARAKURI(v1.0.0)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-1.0.0-indigo.svg)](https://github.com/)
 
 LLM（ChatGPT, Gemini, Claude 等）を高度で没入感のある **TRPGゲームマスター（GM）** へ変貌させるシステムプロンプトおよび画像生成AI用プロンプトの自動作成Webツールです。
 
-👉 **[TRPG_GMプロンプトジェネレーターを試す（GitHub Pages）](https://siro-pj-tech.github.io/trpg-gm/)**
+👉 **[TRPG_GMプロンプトジェネレーター「十六夜カラクリ」を試す（GitHub Pages）](https://siro-pj-tech.github.io/trpg-gm/)**
 
 ---
 
