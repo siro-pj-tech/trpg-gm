@@ -3,56 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AI（ChatGPT / Gemini / Claude）を最高のTRPGゲームマスターに変貌させるプロンプト生成ツール。二段階生成、収束条件進行、音声会話モード等に対応。">
-    <meta name="keywords" content="TRPG, AI, ChatGPT, Gemini, Claude, Prompt Generator, ゲームマスター, プロンプトジェネレーター, AIアドベンチャー">
-    <meta name="author" content="TRPG AI Project">
-    <meta name="version" content="1.0.0">
+    <title>十六夜カラクリ (IZAYOI KARAKURI) - AI TRPG GM & Visual Prompt Generator v1.0.0</title>
     
-    <!-- Open Graph / OGP -->
+    <!-- Meta Data for SEO & OGP -->
+    <meta name="description" content="AIを卓越したゲームマスターに変貌させるTRPGプロンプト生成システム「十六夜カラクリ」。二段階内部判定・動的収束条件・音声会話モード完全対応。">
+    <meta name="keywords" content="十六夜カラクリ, IZAYOI KARAKURI, TRPG, AI GM, AIゲームマスター, Prompt Generator, ChatGPT, Gemini, Claude">
+    <meta property="og:title" content="十六夜カラクリ (IZAYOI KARAKURI) v1.0.0">
+    <meta property="og:description" content="AIを卓越したゲームマスターに変貌させるTRPGプロンプト生成システム。二段階内部判定・動的収束条件・画像プロンプト完全分離。">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="TRPG GM プロンプトジェネレーター v1.0.0">
-    <meta property="og:description" content="AIを最高のゲームマスターにするプロンプト生成ツール。シナリオ・主要人物・進行判定ロジックを一元構築。">
-    <meta property="og:site_name" content="TRPG GM Prompt Generator">
-
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="TRPG GM プロンプトジェネレーター v1.0.0">
-    <meta name="twitter:description" content="AIを最高のゲームマスターにするプロンプト生成ツール。">
 
-    <title>TRPG GM プロンプトジェネレーター v1.0.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Sans+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@700&display=swap');
         
         body { 
             font-family: 'Noto Sans JP', sans-serif;
-            background-color: #0f172a;
+            background-color: #0b0f19;
             color: #f8fafc;
         }
         .font-cinzel {
             font-family: 'Cinzel', serif;
         }
-        .gradient-bg { 
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); 
+        .font-mincho {
+            font-family: 'Shippori Mincho', serif;
+        }
+        .izayoi-gradient-bg { 
+            background: linear-gradient(135deg, #0d0b1a 0%, #1e1333 40%, #152238 100%); 
         }
         .card-bg {
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: #121829;
+            border: 1px solid #1f2d48;
         }
         .input-style {
-            background-color: #0f172a;
-            border: 1px solid #475569;
+            background-color: #080c16;
+            border: 1px solid #2d3b55;
             color: #f1f5f9;
             transition: all 0.2s;
         }
         .input-style:focus {
             border-color: #818cf8;
             outline: none;
-            box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
+            box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.25);
         }
         .prompt-card { 
-            background-color: #0f172a; 
-            border: 1px solid #334155; 
+            background-color: #080c16; 
+            border: 1px solid #1e293b; 
             border-radius: 0.75rem; 
             padding: 1rem; 
             margin-bottom: 1rem; 
@@ -61,52 +57,53 @@
 </head>
 <body class="min-h-screen pb-16">
 
-    <!-- Header -->
-    <header class="gradient-bg border-b border-indigo-500/30 text-white py-8 shadow-2xl mb-8 relative overflow-hidden">
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent pointer-events-none"></div>
+    <header class="izayoi-gradient-bg border-b border-indigo-900/40 text-white py-10 shadow-2xl mb-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-600/15 via-transparent to-transparent pointer-events-none"></div>
         <div class="container mx-auto px-4 text-center relative z-10">
-            <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 border border-indigo-400/30 rounded-full text-indigo-300 text-xs font-semibold mb-3 tracking-wider uppercase">
-                <span>AI TRPG / Text & Voice RPG Generator</span>
-                <span class="bg-indigo-600 text-white px-2 py-0.5 rounded-full text-[10px] font-mono">v1.0.0</span>
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 bg-indigo-950/80 border border-indigo-500/40 rounded-full text-indigo-300 text-xs font-semibold mb-3 tracking-wider uppercase shadow-inner">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                <span>AI TRPG GM & Visual Prompt Generator</span>
+                <span class="bg-indigo-800/60 text-white px-1.5 py-0.5 rounded text-[10px]">v1.0.0</span>
             </div>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-white to-purple-200">
-                TRPG GM PROMPT GENERATOR
+            <h1 class="text-4xl md:text-5xl font-black tracking-wider mb-2 font-mincho text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-100 to-amber-100 drop-shadow-md">
+                十六夜カラクリ
             </h1>
-            <p class="text-indigo-200 text-sm md:text-base max-w-xl mx-auto opacity-90">
-                AIを最高のゲームマスターに変貌させるプロンプト作成ツール。
+            <p class="text-xs md:text-sm font-cinzel text-indigo-300/80 tracking-widest uppercase mb-2">IZAYOI KARAKURI - TRPG ENGINE</p>
+            <p class="text-slate-300 text-xs md:text-sm max-w-xl mx-auto opacity-90 leading-relaxed">
+                AIを二段階思考と動的収束機構を持つ「最強のGM」へと覚醒させるプロンプト生成システム。
             </p>
         </div>
     </header>
 
     <main class="container mx-auto px-4 max-w-4xl">
-        <div class="card-bg rounded-2xl shadow-2xl overflow-hidden mb-8">
+        <div class="card-bg rounded-2xl shadow-2xl overflow-hidden mb-8 border-indigo-900/20">
             <div class="p-6 md:p-8 space-y-8">
                 
-                <!-- Scenario Selection -->
+                <!-- 1. Scenario Selection -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
                         <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
-                            <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">1</span>
+                            <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">1</span>
                             世界観・シナリオを選択
                         </label>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <button type="button" onclick="selectScenario('fantasy')" id="btn-fantasy" class="scenario-btn border-2 border-indigo-500/30 p-4 rounded-xl hover:border-indigo-400 bg-slate-900/50 transition-all text-left group">
+                        <button type="button" onclick="selectScenario('fantasy')" id="btn-fantasy" class="scenario-btn border-2 border-slate-700 p-4 rounded-xl hover:border-indigo-500/60 bg-slate-900/60 transition-all text-left group">
                             <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">⚔️</div>
                             <div class="font-bold text-slate-200 text-sm">王道ファンタジー</div>
                             <div class="text-[11px] text-slate-400 mt-1">魔王討伐の旅</div>
                         </button>
-                        <button type="button" onclick="selectScenario('japanese')" id="btn-japanese" class="scenario-btn border-2 border-indigo-500/30 p-4 rounded-xl hover:border-indigo-400 bg-slate-900/50 transition-all text-left group">
+                        <button type="button" onclick="selectScenario('japanese')" id="btn-japanese" class="scenario-btn border-2 border-slate-700 p-4 rounded-xl hover:border-indigo-500/60 bg-slate-900/60 transition-all text-left group">
                             <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">⛩️</div>
                             <div class="font-bold text-slate-200 text-sm">和風あやかし伝</div>
                             <div class="text-[11px] text-slate-400 mt-1">妖怪王退治の旅</div>
                         </button>
-                        <button type="button" onclick="selectScenario('sf')" id="btn-sf" class="scenario-btn border-2 border-indigo-500/30 p-4 rounded-xl hover:border-indigo-400 bg-slate-900/50 transition-all text-left group">
+                        <button type="button" onclick="selectScenario('sf')" id="btn-sf" class="scenario-btn border-2 border-slate-700 p-4 rounded-xl hover:border-indigo-500/60 bg-slate-900/60 transition-all text-left group">
                             <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">🚀</div>
                             <div class="font-bold text-slate-200 text-sm">SFスペースオペラ</div>
                             <div class="text-[11px] text-slate-400 mt-1">星間帝国への旅</div>
                         </button>
-                        <button type="button" onclick="selectScenario('custom')" id="btn-custom" class="scenario-btn border-2 border-indigo-500/30 p-4 rounded-xl hover:border-indigo-400 bg-slate-900/50 transition-all text-left group">
+                        <button type="button" onclick="selectScenario('custom')" id="btn-custom" class="scenario-btn border-2 border-slate-700 p-4 rounded-xl hover:border-indigo-500/60 bg-slate-900/60 transition-all text-left group">
                             <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">✨</div>
                             <div class="font-bold text-slate-200 text-sm">完全カスタム</div>
                             <div class="text-[11px] text-slate-400 mt-1">全自由設定</div>
@@ -114,14 +111,14 @@
                     </div>
                 </div>
 
-                <!-- Hero & Basic Settings -->
-                <div class="space-y-4 pt-2 border-t border-slate-700/60">
+                <!-- 2. Hero & Basic Settings -->
+                <div class="space-y-4 pt-2 border-t border-slate-800">
                     <div class="flex items-center justify-between">
                         <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
-                            <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">2</span>
+                            <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                             主人公・難易度設定
                         </label>
-                        <button type="button" onclick="randomizeHero()" class="text-xs bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
+                        <button type="button" onclick="randomizeHero()" class="text-xs bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
                             🎲 主人公をランダム入力
                         </button>
                     </div>
@@ -145,28 +142,28 @@
                     </div>
                 </div>
 
-                <!-- World & Country Settings -->
-                <div class="space-y-4 pt-2 border-t border-slate-700/60">
+                <!-- 3. World & Stage Settings -->
+                <div class="space-y-4 pt-2 border-t border-slate-800">
                     <div class="flex items-center justify-between">
                         <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
-                            <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">3</span>
+                            <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                             旅のルート・3つの国（ステージ）設定
                         </label>
-                        <button type="button" onclick="randomizeCountries()" class="text-xs bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
+                        <button type="button" onclick="randomizeCountries()" class="text-xs bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
                             🎲 地名をランダム生成
                         </button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs text-indigo-400 mb-1">第1の国 (序盤)</label>
+                            <label class="block text-xs text-indigo-400/90 mb-1">第1の国 (序盤)</label>
                             <input type="text" id="country1" placeholder="例：ルミナリア王国" class="w-full px-3 py-2 text-sm rounded-lg input-style">
                         </div>
                         <div>
-                            <label class="block text-xs text-indigo-400 mb-1">第2の国 (中盤)</label>
+                            <label class="block text-xs text-indigo-400/90 mb-1">第2の国 (中盤)</label>
                             <input type="text" id="country2" placeholder="例：ヴェルダン森林同盟" class="w-full px-3 py-2 text-sm rounded-lg input-style">
                         </div>
                         <div>
-                            <label class="block text-xs text-indigo-400 mb-1">第3の国 (終盤)</label>
+                            <label class="block text-xs text-indigo-400/90 mb-1">第3の国 (終盤)</label>
                             <input type="text" id="country3" placeholder="例：ドグラザード帝国" class="w-full px-3 py-2 text-sm rounded-lg input-style">
                         </div>
                     </div>
@@ -182,14 +179,14 @@
                     </div>
                 </div>
 
-                <!-- Custom Extension Section -->
-                <div id="customExtForm" class="space-y-4 pt-2 border-t border-slate-700/60 transition-all opacity-50 pointer-events-none">
+                <!-- Custom Extension Form -->
+                <div id="customExtForm" class="space-y-4 pt-2 border-t border-slate-800 transition-all opacity-50 pointer-events-none">
                     <div class="flex items-center justify-between">
                         <label class="block text-sm font-bold text-amber-300 flex items-center gap-2">
                             <span class="bg-amber-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">⚙️</span>
-                            完全カスタム用：世界観・目的・イベント＆ターン設定
+                            完全カスタム用：世界観・目的・イベント＆目安ターン設定
                         </label>
-                        <span id="customLockBadge" class="text-[10px] bg-slate-800 text-slate-400 border border-slate-700 px-2 py-0.5 rounded font-normal">「完全カスタム」選択時のみ編集可能</span>
+                        <span id="customLockBadge" class="text-[10px] bg-slate-900 text-slate-500 border border-slate-800 px-2 py-0.5 rounded font-normal">「完全カスタム」選択時のみ編集可能</span>
                     </div>
 
                     <!-- Turn Settings -->
@@ -249,14 +246,14 @@
                     </div>
                 </div>
 
-                <!-- Key NPCs -->
-                <div class="space-y-4 pt-2 border-t border-slate-700/60">
+                <!-- 4. Key NPCs -->
+                <div class="space-y-4 pt-2 border-t border-slate-800">
                     <div class="flex items-center justify-between">
                         <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
-                            <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">4</span>
+                            <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">4</span>
                             旅で出会う主要人物（3名）
                         </label>
-                        <button type="button" onclick="randomizeNPCs()" class="text-xs bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
+                        <button type="button" onclick="randomizeNPCs()" class="text-xs bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-900/50 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
                             🎲 人物をランダム生成
                         </button>
                     </div>
@@ -276,10 +273,10 @@
                     </div>
                 </div>
 
-                <!-- Visual Style -->
-                <div class="space-y-4 pt-2 border-t border-slate-700/60">
+                <!-- 5. Visual Style -->
+                <div class="space-y-4 pt-2 border-t border-slate-800">
                     <label class="block text-sm font-bold text-indigo-300 flex items-center gap-2">
-                        <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">5</span>
+                        <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">5</span>
                         ビジュアル画風（画像生成AI用）
                     </label>
                     <select id="artStyle" class="w-full px-4 py-2.5 text-sm rounded-lg input-style">
@@ -293,46 +290,45 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700/60">
-                    <button type="button" onclick="randomizeAll()" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-800">
+                    <button type="button" onclick="randomizeAll()" class="bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-900/50 font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
                         <span>🎲</span> すべてランダム入力
                     </button>
-                    <button type="button" onclick="generatePrompts()" class="md:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform active:scale-[0.99] text-center">
+                    <button type="button" onclick="generatePrompts()" class="md:col-span-2 bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-950/50 transition-all transform active:scale-[0.99] text-center tracking-wider">
                         PROMPT GENERATE (プロンプト生成)
                     </button>
                 </div>
 
             </div>
 
-            <!-- Output Area -->
-            <div id="outputSection" class="hidden border-t border-slate-700/80 bg-slate-950 p-6 md:p-8 space-y-6">
+            <div id="outputSection" class="hidden border-t border-slate-800 bg-slate-950 p-6 md:p-8 space-y-6">
                 
                 <!-- 1. Visual Prompt -->
-                <div class="prompt-card border-indigo-500/30">
+                <div class="prompt-card border-indigo-900/40">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-indigo-400 flex items-center gap-2 text-sm md:text-base">
                             <span>🖼️</span> 【手順1】冒険の始まり イメージ画像生成プロンプト
                         </h3>
-                        <span class="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-700/50 px-2 py-0.5 rounded-full">DALL-E 3 / Gemini / MJ</span>
+                        <span class="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-800/60 px-2 py-0.5 rounded-full">DALL-E 3 / Gemini / MJ</span>
                     </div>
                     <p class="text-xs text-slate-400 mb-3">最初にこれを画像生成AI（DALL-E 3やGeminiなど）へ貼り付けて、冒険の始まりのイラストを出力させてください。</p>
-                    <pre id="visualPromptResult" class="bg-slate-900 border border-slate-800 p-3.5 rounded-lg text-xs text-indigo-200 max-h-52 overflow-y-auto whitespace-pre-wrap font-mono leading-relaxed mb-3"></pre>
-                    <button type="button" onclick="copyText('visualPromptResult')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2">
+                    <pre id="visualPromptResult" class="bg-slate-900 border border-slate-800 p-3.5 rounded-lg text-xs text-indigo-200 h-48 overflow-y-auto whitespace-pre-wrap font-mono leading-relaxed mb-3 scrollbar-thin"></pre>
+                    <button type="button" onclick="copyText('visualPromptResult')" class="w-full bg-indigo-700 hover:bg-indigo-600 text-white py-2.5 rounded-lg text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2">
                         📋 画像用プロンプトをコピー
                     </button>
                 </div>
 
                 <!-- 2. GM Prompt -->
-                <div class="prompt-card border-emerald-500/30">
+                <div class="prompt-card border-emerald-900/40">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-emerald-400 flex items-center gap-2 text-sm md:text-base">
-                            <span>📜</span> 【手順2】ゲームマスター(GM) 進行用システムプロンプト
+                            <span>📜</span> 【手順2】十六夜カラクリ GM進行用システムプロンプト
                         </h3>
-                        <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded-full">ChatGPT / Gemini / Claude用</span>
+                        <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800/60 px-2 py-0.5 rounded-full">ChatGPT / Gemini / Claude用</span>
                     </div>
                     <p class="text-xs text-slate-400 mb-3">画像が生成された後（または直接）、このプロンプトをチャットAIへ貼り付けてゲームを開始してください。</p>
-                    <pre id="gmPromptResult" class="bg-slate-900 border border-slate-800 p-3.5 rounded-lg text-xs text-emerald-200 max-h-80 overflow-y-auto whitespace-pre-wrap font-mono leading-relaxed mb-3"></pre>
-                    <button type="button" onclick="copyText('gmPromptResult')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2">
+                    <pre id="gmPromptResult" class="bg-slate-900 border border-slate-800 p-3.5 rounded-lg text-xs text-emerald-200 h-80 overflow-y-auto whitespace-pre-wrap font-mono leading-relaxed mb-3 scrollbar-thin"></pre>
+                    <button type="button" onclick="copyText('gmPromptResult')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-lg text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2">
                         📋 GM用プロンプトをコピー
                     </button>
                 </div>
@@ -340,35 +336,34 @@
             </div>
         </div>
 
-        <!-- How to Play Card -->
-        <div class="card-bg p-6 rounded-2xl border border-slate-700/60 shadow-xl">
-            <h3 class="font-bold text-slate-200 mb-4 flex items-center gap-2 text-sm md:text-base">
+        <div class="card-bg p-6 rounded-2xl border border-slate-800 shadow-xl">
+            <h3 class="font-bold text-slate-200 mb-4 flex items-center gap-2 text-sm md:text-base font-mincho">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                 </svg>
-                AI TRPGの遊び方（ChatGPT / Gemini / Claude 共通）
+                十六夜カラクリ AI TRPGの遊び方（ChatGPT / Gemini / Claude 共通）
             </h3>
             <ol class="text-xs md:text-sm text-slate-300 space-y-3">
                 <li class="flex gap-3 items-start">
-                    <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
+                    <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
                     <div>設定を入力して「PROMPT GENERATE」を押します。（迷ったら「🎲すべてランダム」が便利です）</div>
                 </li>
                 <li class="flex gap-3 items-start">
-                    <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+                    <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
                     <div><strong>【手順1】</strong>のプロンプトをAIに送信して、冒険の旅立ちイメージ画像を生成させます。</div>
                 </li>
                 <li class="flex gap-3 items-start">
-                    <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
+                    <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
                     <div>画像が出力されたら、続けて<strong>【手順2】</strong>のプロンプトを送信するとAIがGMとして物語を開始します。</div>
                 </li>
                 <li class="flex gap-3 items-start">
-                    <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">4</span>
+                    <span class="bg-indigo-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">4</span>
                     <div>毎ターンAIから状況描写と [A][B][C][自由入力] の選択肢が提示されます。自由に入力してあなただけの物語を紡ぎましょう！</div>
                 </li>
-                <li class="flex gap-3 items-start border-t border-slate-700/60 pt-3 text-amber-200/90">
+                <li class="flex gap-3 items-start border-t border-slate-800 pt-3 text-amber-200/90">
                     <span class="bg-amber-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">💡</span>
                     <div>
-                        <strong>特殊入力＆音声会話テクニック：</strong><br>
+                        <strong>特殊操作＆音声会話テクニック：</strong><br>
                         ・GMの解釈や判定に異議・疑問がある場合は回答を<strong>「＊質問や異議内容＊」</strong>のようにアスタリスクで囲むとGMが補足や調整を行います。<br>
                         ・音声会話（リアルタイム会話モード）の場合は、GMが進行状況や選択肢を冗長にならずテンポ良く開示するように指示されています。
                     </div>
@@ -378,7 +373,7 @@
     </main>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-6 py-3 rounded-full shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none text-xs font-bold z-50 flex items-center gap-2 border border-indigo-400">
+    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-indigo-700 text-white px-6 py-3 rounded-full shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none text-xs font-bold z-50 flex items-center gap-2 border border-indigo-400">
         <span>✅</span> <span id="toastMsg">クリップボードにコピーしました！</span>
     </div>
 
@@ -459,11 +454,11 @@
             currentScenario = id;
             document.querySelectorAll('.scenario-btn').forEach(btn => {
                 btn.classList.remove('border-indigo-500', 'bg-indigo-950/60', 'ring-2', 'ring-indigo-500/50');
-                btn.classList.add('border-indigo-500/30', 'bg-slate-900/50');
+                btn.classList.add('border-slate-700', 'bg-slate-900/60');
             });
             
             const selected = document.getElementById('btn-' + id);
-            selected.classList.remove('border-indigo-500/30', 'bg-slate-900/50');
+            selected.classList.remove('border-slate-700', 'bg-slate-900/60');
             selected.classList.add('border-indigo-500', 'bg-indigo-950/60', 'ring-2', 'ring-indigo-500/50');
 
             // Custom scenario unlock/lock logic
@@ -493,7 +488,7 @@
                 customGoalText.disabled = true;
                 customEvents.disabled = true;
                 customLockBadge.innerText = '「完全カスタム」選択時のみ編集可能';
-                customLockBadge.className = 'text-[10px] bg-slate-800 text-slate-400 border border-slate-700 px-2 py-0.5 rounded font-normal';
+                customLockBadge.className = 'text-[10px] bg-slate-900 text-slate-500 border border-slate-800 px-2 py-0.5 rounded font-normal';
             }
 
             const preset = scenarioPresets[id];
@@ -509,7 +504,7 @@
                 document.getElementById('npc2').value = preset.npc2;
                 document.getElementById('npc3').value = preset.npc3;
                 
-                // Reset custom specific inputs
+                // Reset custom inputs
                 startTownTurns.value = '4';
                 countryTurns.value = '6';
                 customWorld.value = '';
@@ -600,10 +595,10 @@ ${artStyle}
 - 画像内に文字列、ロゴ、UI、テキスト、セリフ、数字などを一切含めないでください。
 - 物語の導入として、世界観と主人公の旅立ちを感じさせる、没入感の高い壮大な一枚絵（ビジュアル）を作成してください。`;
 
-            // 2. GM Prompt Logic
+            // 2. GM Prompt Logic (Izayoi Karakuri Engine)
             const gmPrompt = `これは冒険者が${finalGoal}へ向かう物語である。
 
-あなたは自由度の高いテキスト型RPGのゲームマスターです。
+あなたは自由度の高いテキスト型RPGの最高峰ゲームマスター「十六夜カラクリ（IZAYOI KARAKURI）」です。
 以下の設定と、それまでの冒険で確定した出来事を保持しながら物語を進行してください。
 
 ## 基本設定
